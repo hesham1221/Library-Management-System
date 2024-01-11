@@ -80,4 +80,12 @@ export class UserService {
     const user = await userRepository.findOneOrError({ slug });
     return responseWrapper(user, response);
   }
+
+  async me(request: Request, response: Response) {
+    const user = await userRepository.findOneOrError(
+      { id: request.user.id },
+      errorMessages.USER_NOT_FOUND,
+    );
+    return responseWrapper(user, response);
+  }
 }

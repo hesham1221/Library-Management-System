@@ -14,7 +14,8 @@ class MailService {
       this.processMailJop.bind(this),
     );
     this.transporter = nodemailer.createTransport({
-      host: get('SMTP_HOST').asString() || 'gmail',
+      service: get('SMTP_SERVICE').asString() || 'gmail',
+      host: get('SMTP_HOST').asString() || 'smtp.gmail.com',
       port: get('SMTP_PORT').asInt() || 587,
       secure: get('SMTP_SECURE').asBool() ?? false,
       auth: {
@@ -30,15 +31,17 @@ class MailService {
     this.transporter.use(
       'compile',
       nodemailerMjmlPlugin({
-        templateFolder: join('mjml', 'templates'),
+        templateFolder: join(__dirname, './mjml/templates'),
       }),
     );
     await this.transporter.sendMail({
       to,
       subject,
-      from: from || 'test@test.com',
+      from: from || get('SMTP_USER').required().asString(),
       templateName,
-      templateData,
+      templateData: templateData
+        ? { ...templateData, headerTitle: templateData.headerTitle || subject }
+        : { headerTitle: subject },
     });
   }
   async sendMail({

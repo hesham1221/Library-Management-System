@@ -90,3 +90,7 @@ export function generateVerificationCodeAndExpiryDate() {
     expiryDateAfterOneHour: new Date(Date.now() + 3600000),
   };
 }
+
+export function enumToArray(enumObj: any): string[] {
+  return Object.values(enumObj);
+}

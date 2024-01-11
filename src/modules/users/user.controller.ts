@@ -21,4 +21,8 @@ export class UserController {
     const userService: UserService = new UserService();
     return userService.userBoard(request.params.slug, response);
   }
+  async me(request: Request, response: Response) {
+    const userService: UserService = new UserService();
+    return userService.me(request, response);
+  }
 }

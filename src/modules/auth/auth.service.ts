@@ -1,10 +1,7 @@
 import { Response } from 'express';
 import { LoginDto } from './dto/login-admin.dto';
 import userRepository from '@modules/users/repositories/user.repository';
-import {
-  UserRolEnum,
-  UserVerificationCodeUseCaseEnum,
-} from '@modules/users/user.enum';
+import { UserVerificationCodeUseCaseEnum } from '@modules/users/user.enum';
 import { errorMessages } from '@common/errors/messages';
 import {
   appendAuthTokenToUser,
@@ -18,8 +15,9 @@ import { CreateUserByAdminInput } from '@modules/users/dto/create-user-by-admin.
 import userVerificationCodeRepository from '@modules/users/repositories/user-verification-code.repository';
 import mailService from '@common/providers/mail';
 import { MoreThan } from 'typeorm';
+import BaseError from '@common/errors/base-error';
 export class AuthService {
-  async loginAdmin(input: LoginDto, response: Response) {
+  async login(input: LoginDto, response: Response) {
     const user = await userRepository.findOneOrError(
       { verifiedEmail: input.email, role: input.role },
       errorMessages.INVALID_CREDENTIALS,
@@ -28,7 +26,10 @@ export class AuthService {
     return responseWrapper(appendAuthTokenToUser(user), response);
   }
 
-  async signupBorrower(input: CreateUserByAdminInput, response: Response) {
+  async signupBorrower(
+    input: Omit<CreateUserByAdminInput, 'role'>,
+    response: Response,
+  ) {
     await userRepository.findOneWithErorr(
       { verifiedEmail: input.email },
       errorMessages.USER_ALREADY_EXISTS,
@@ -94,14 +95,22 @@ export class AuthService {
     response: Response,
   ) {
     const user = await userRepository.findOneOrError(
-      { notVerifiedEmail: email },
+      useCase === UserVerificationCodeUseCaseEnum.PASSWORD_RESET
+        ? { verifiedEmail: email }
+        : { notVerifiedEmail: email },
       errorMessages.USER_NOT_FOUND,
     );
     await userVerificationCodeRepository.findOneOrError(
-      { user, useCase, code: otp, expiryDate: MoreThan(new Date()) },
+      {
+        user: { id: user.id },
+        useCase,
+        code: otp,
+        expiryDate: MoreThan(new Date()),
+      },
       errorMessages.INVALID_VERIFICATION_CODE,
     );
-    await userVerificationCodeRepository.deleteAll({ user, useCase });
+    useCase !== UserVerificationCodeUseCaseEnum.PASSWORD_RESET &&
+      (await userVerificationCodeRepository.deleteAll({ user, useCase }));
     await userRepository.updateOneFromExistingModel(user, {
       verifiedEmail: email,
       notVerifiedEmail: null as any,
@@ -137,6 +146,38 @@ export class AuthService {
       templateData: {
         otp: verificationData.verificationCode,
       },
+    });
+    return responseWrapper(null, response);
+  }
+
+  async resetPassword(
+    email: string,
+    otp: string,
+    newPassword: string,
+    response: Response,
+  ) {
+    const user = await userRepository.findOneOrError(
+      { verifiedEmail: email },
+      errorMessages.USER_NOT_FOUND,
+    );
+    await userVerificationCodeRepository.findOneOrError(
+      {
+        user,
+        useCase: UserVerificationCodeUseCaseEnum.PASSWORD_RESET,
+        code: otp,
+        expiryDate: MoreThan(new Date()),
+      },
+      errorMessages.INVALID_VERIFICATION_CODE,
+    );
+    if (await matchPassword(newPassword, user.password, false)) {
+      throw new BaseError(errorMessages.PASSWORD_CANNOT_BE_SAME);
+    }
+    await userVerificationCodeRepository.deleteAll({
+      user,
+      useCase: UserVerificationCodeUseCaseEnum.PASSWORD_RESET,
+    });
+    await userRepository.updateOneFromExistingModel(user, {
+      password: await hashPassword(newPassword),
     });
     return responseWrapper(null, response);
   }
