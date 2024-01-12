@@ -7,11 +7,15 @@ export class UserController {
   }
   async updateUserByAdmin(request: Request, response: Response) {
     const userService: UserService = new UserService();
-    return userService.updateUserByAdmin(request.body, response);
+    return userService.updateUserByAdmin(
+      request.params.slug,
+      request.body,
+      response,
+    );
   }
   async deleteUserByAdmin(request: Request, response: Response) {
     const userService: UserService = new UserService();
-    return userService.deleteUserByAdmin(request.params.id, response);
+    return userService.deleteUserByAdmin(request.params.slug, response);
   }
   async getUsers(request: Request, response: Response) {
     const userService: UserService = new UserService();

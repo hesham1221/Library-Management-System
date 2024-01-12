@@ -4,13 +4,45 @@ import isAuthenticated from '@common/middlewares/is-authenticated.middleware';
 import isAdmin from '@common/middlewares/is-admin.middleware';
 import { Joi, Segments, celebrate } from 'celebrate';
 import { enumToArray } from '@common/utils';
-import { CursorBasedPaginationDirection } from '@common/types/types';
+import {
+  CursorBasedPaginationDirection,
+  SortTypeEnum,
+} from '@common/types/types';
 
 const bookRouter = Router();
 const bookController = new BookController();
 
-bookRouter.get('/books', bookController.getAllBooks);
-bookRouter.get('/booked', isAuthenticated, bookController.myBookedBooks);
+bookRouter.get(
+  '/books',
+  celebrate({
+    [Segments.QUERY]: {
+      page: Joi.number().default(1),
+      limit: Joi.number().default(15),
+      searchKey: Joi.string(),
+      authorId: Joi.string(),
+      available: Joi.boolean(),
+      sortBy: Joi.object({
+        numberOfBorrowed: Joi.string().valid(...enumToArray(SortTypeEnum)),
+        availableQuantity: Joi.string().valid(...enumToArray(SortTypeEnum)),
+        totalQuantity: Joi.string().valid(...enumToArray(SortTypeEnum)),
+        createdAt: Joi.string().valid(...enumToArray(SortTypeEnum)),
+      }),
+    },
+  }),
+  bookController.getAllBooks,
+);
+bookRouter.get(
+  '/booked',
+  celebrate({
+    [Segments.QUERY]: {
+      page: Joi.number().default(1),
+      limit: Joi.string().default(15),
+      searchKey: Joi.string(),
+    },
+  }),
+  isAuthenticated,
+  bookController.myBookedBooks,
+);
 bookRouter.get('/book/:slug', bookController.getSingleBook);
 bookRouter.get(
   '/book/:slug/history',
@@ -127,6 +159,16 @@ bookRouter.delete(
   bookController.deleteBookAuthor,
 );
 
-bookRouter.get('/author', bookController.getBookAuthors);
+bookRouter.get(
+  '/author',
+  celebrate({
+    [Segments.QUERY]: {
+      page: Joi.number().default(1),
+      limit: Joi.string().default(15),
+      searchKey: Joi.string(),
+    },
+  }),
+  bookController.getBookAuthors,
+);
 bookRouter.get('/author/:slug', bookController.getBookAuthor);
 export default bookRouter;

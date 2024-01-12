@@ -6,7 +6,7 @@ import userRouter from '@modules/users/routers/user.router';
 import { Router } from 'express';
 
 const routes = Router();
-routes.use('/admin', adminRouter);
+routes.use('/users', adminRouter);
 routes.use('/auth', authRouter);
 routes.use('/users', userRouter);
 routes.use('/upload', fileRouter);

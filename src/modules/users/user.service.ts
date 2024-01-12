@@ -28,9 +28,13 @@ export class UserService {
     return responseWrapper(user, response);
   }
 
-  async updateUserByAdmin(input: UpdateUserDetails, response: Response) {
-    const { email, userId, password, ...rest } = input;
-    const user = await userRepository.findOneOrError({ id: userId });
+  async updateUserByAdmin(
+    slug: string,
+    input: UpdateUserDetails,
+    response: Response,
+  ) {
+    const { email, password, ...rest } = input;
+    const user = await userRepository.findOneOrError({ slug: slug });
     email &&
       (await userRepository.findOneWithErorr(
         { verifiedEmail: email },
@@ -47,9 +51,9 @@ export class UserService {
     return responseWrapper(updatedUser, response);
   }
 
-  async deleteUserByAdmin(id: string, response: Response) {
-    await userRepository.findOneOrError({ id }, errorMessages.USER_NOT_FOUND);
-    await userRepository.softDelete({ id }); // soft delete user as if he borrowed a book
+  async deleteUserByAdmin(slug: string, response: Response) {
+    await userRepository.findOneOrError({ slug }, errorMessages.USER_NOT_FOUND);
+    await userRepository.softDelete({ slug }); // soft delete user as if he borrowed a book
     return responseWrapper(null, response);
   }
 

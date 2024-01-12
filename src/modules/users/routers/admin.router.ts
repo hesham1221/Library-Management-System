@@ -12,7 +12,7 @@ adminRouter.use(isAuthenticated);
 adminRouter.use(isAdmin);
 
 adminRouter.post(
-  '/user',
+  '/',
   celebrate({
     [Segments.BODY]: {
       email: Joi.string().email().required(),
@@ -26,15 +26,52 @@ adminRouter.post(
   userController.createUserByAdmin,
 );
 
-adminRouter.get('/users', userController.getUsers);
 adminRouter.get(
-  '/users/:slug',
+  '/',
+  celebrate({
+    [Segments.QUERY]: {
+      page: Joi.number().default(1),
+      limit: Joi.string().default(15),
+      searchKey: Joi.string(),
+      role: Joi.string().valid(UserRolEnum.BORROWER, UserRolEnum.ADMIN),
+    },
+  }),
+  userController.getUsers,
+);
+adminRouter.get(
+  '/:slug',
   celebrate({
     [Segments.PARAMS]: {
       slug: Joi.string().required(),
     },
   }),
   userController.userBoard,
+);
+
+adminRouter.delete(
+  '/:slug',
+  celebrate({
+    [Segments.PARAMS]: {
+      slug: Joi.string().required(),
+    },
+  }),
+  userController.deleteUserByAdmin,
+);
+
+adminRouter.patch(
+  '/:slug',
+  celebrate({
+    [Segments.PARAMS]: {
+      slug: Joi.string().required(),
+    },
+    [Segments.BODY]: {
+      email: Joi.string().email(),
+      password: Joi.string(),
+      name: Joi.string(),
+      role: Joi.string().valid(UserRolEnum.BORROWER, UserRolEnum.ADMIN),
+    },
+  }),
+  userController.updateUserByAdmin,
 );
 
 export default adminRouter;
