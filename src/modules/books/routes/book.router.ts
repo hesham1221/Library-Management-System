@@ -8,6 +8,7 @@ import {
   CursorBasedPaginationDirection,
   SortTypeEnum,
 } from '@common/types/types';
+import rateLimiter from '@common/middlewares/rate-limitter.middleware';
 
 const bookRouter = Router();
 const bookController = new BookController();
@@ -66,6 +67,7 @@ bookRouter.post(
 );
 bookRouter.post(
   '/book/:slug',
+  rateLimiter, // add rate limiter
   isAuthenticated,
   celebrate({
     [Segments.BODY]: {
@@ -171,4 +173,17 @@ bookRouter.get(
   bookController.getBookAuthors,
 );
 bookRouter.get('/author/:slug', bookController.getBookAuthor);
+bookRouter.get(
+  '/books/csv',
+  isAuthenticated,
+  isAdmin,
+  celebrate({
+    [Segments.QUERY]: {
+      startDate: Joi.number(),
+      endDate: Joi.number(),
+      type: Joi.string().valid('overdue', 'booked').default('overdue'),
+    },
+  }),
+  bookController.exportBooksCSV,
+);
 export default bookRouter;

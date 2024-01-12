@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { GetAllBooksDto } from './dto/get-all-book.dto';
 import bookRepository from './repositories/book.repository';
-import { Like, MoreThan } from 'typeorm';
+import { Between, Like, MoreThan } from 'typeorm';
 import {
   formatDateddmmyyyy,
   getDateOnly,
@@ -17,7 +17,12 @@ import mailService from '@common/providers/mail';
 import { BookABookDto } from './dto/book-a-book.dto';
 import userRepository from '@modules/users/repositories/user.repository';
 import bookBorrowDetailsRepository from './repositories/book-borrow-details.repository';
-import { differenceInDays, differenceInMilliseconds } from 'date-fns';
+import {
+  differenceInDays,
+  differenceInMilliseconds,
+  format,
+  subMonths,
+} from 'date-fns';
 import { ReturnBookDto } from './dto/return-book.dto';
 import { CursorBasedPaginationDirection } from '@common/types/types';
 import BaseError from '@common/errors/base-error';
@@ -340,6 +345,45 @@ export class BookService {
       errorMessages.AUTHOR_NOT_FOUND,
     );
     return responseWrapper(author, response);
+  }
+
+  async exportBooksCSV(
+    input: { startDate?: Date; endDate?: Date; type: 'overdue' | 'booked' },
+    response: Response,
+  ) {
+    const start = input.startDate || subMonths(new Date(), 1);
+    const end = input.endDate || new Date();
+    const booksData = await bookBorrowDetailsRepository.findAll(
+      {
+        ...(input.type === 'overdue'
+          ? {
+              actualReturnDate: null,
+              returnDate: Between(start, end),
+            }
+          : {
+              borrowedDate: Between(start, end),
+            }),
+      },
+      { book: true, borrower: true },
+    );
+    let csvContent =
+      'Book ID,Book Title,Borrower ID,Borrower Name,Borrowed Date,Return Date\n';
+    booksData.forEach(detail => {
+      const row = `${detail.bookId},"${detail.book.title}",${
+        detail.borrowerId
+      },"${detail.borrower.name}",${format(
+        detail.borrowedDate,
+        'yyyy-MM-dd',
+      )},${format(detail.returnDate, 'yyyy-MM-dd')}`;
+      csvContent += row + '\n';
+    });
+    const dateStr = format(new Date(), 'yyyyMMdd');
+    response.setHeader('Content-Type', 'text/csv');
+    response.setHeader(
+      'Content-Disposition',
+      `attachment; filename=overdue_books_${dateStr}.csv`,
+    );
+    response.send(csvContent);
   }
 
   private async processBookJob(job: any) {

@@ -6,11 +6,13 @@ import {
   UserVerificationCodeUseCaseEnum,
 } from '@modules/users/user.enum';
 import { enumToArray } from '@common/utils';
+import rateLimiter from '@common/middlewares/rate-limitter.middleware';
 
 const authRouter = Router();
 const authController = new AuthController();
 authRouter.post(
   '/sign-in',
+  rateLimiter, // add rate limiter
   celebrate({
     [Segments.BODY]: {
       email: Joi.string().email().required(),

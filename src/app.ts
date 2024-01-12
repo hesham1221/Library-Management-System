@@ -25,7 +25,8 @@ async function main() {
     app.use(cors());
     app.use(express.json());
     app.use(lang);
-    app.use(rateLimiter);
+    // Note: rate limitter should work global but you asked for only two endpoints
+    // app.use(rateLimiter);
     app.use('/files', express.static(uploadConfig.directory));
     app.use(routes);
     app.use(errors());

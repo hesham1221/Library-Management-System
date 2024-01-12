@@ -7,6 +7,7 @@ This Library Management System is a robust platform designed to manage library o
 ## Features
 
 - **Borrower Features:**
+
   - Register, login, forget password, reset password, and verify account.
   - Book and return books.
   - View all available books.
@@ -16,6 +17,7 @@ This Library Management System is a robust platform designed to manage library o
   - Create and manage borrower and admin accounts.
   - Manage books and authors.
   - View booking history of each book borrowing for each day (with cursor).
+  - Export Booked or overdue Books due to a specific range or the past month.
   - Perform advanced administrative tasks.
 
 ## Technical Stack
@@ -54,7 +56,7 @@ Our Library Management System follows a modular and clean architecture for ease 
 
 ## API Design
 
-- **Response Structure:**  
+- **Response Structure:**
 
   ```typescript
   export class ResponseType<T> {
@@ -66,7 +68,7 @@ Our Library Management System follows a modular and clean architecture for ease 
 
 - **Error Handling:** Custom `BaseError` class, extending `Error` with localization support.
 - **File Uploads:** Utilizes `multer` for handling file uploads.
-- **Rate Limiting:** Configured for global application use.
+- **Rate Limiting:** Configured for global application use but it's disbaled as business wanted choose two endpoints choosed (`/sign-in` , `/book/:slug`).
 
 ## Repository Pattern
 
@@ -93,7 +95,7 @@ export interface PaginationRes<T> {
     direction: CursorBasedPaginationDirection;
   };
 }
-  ```
+```
 
 - `items`: Array of data items.
 - `pageInfo`: Contains pagination details such as page numbers, limits, cursors, total count, and navigation flags.

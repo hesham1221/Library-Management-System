@@ -92,4 +92,9 @@ export class BookController {
       response,
     );
   }
+
+  async exportBooksCSV(request: Request, response: Response) {
+    const bookService = new BookService();
+    return bookService.exportBooksCSV(request.query as any, response);
+  }
 }
