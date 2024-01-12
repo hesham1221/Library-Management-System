@@ -1,0 +1,18 @@
+<mjml>
+  <mj-body>
+    <mj-include path="../components/header.mjml" />
+    <mj-section background-color="#ffffff" padding="20px">
+      <mj-column>
+        <mj-text font-size="16px" line-height="200%" color="#555555"
+          >You have successfully booked the book : <b>{{bookName}}</b> from
+          {{startBookingDate}} to {{endBookingDate}}.</mj-text
+        >
+        <mj-text font-size="16px" color="#555555">
+          If you didn't recieve the book yet , recieve the book at the date
+          provided above.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-include path="../components/footer.mjml" />
+  </mj-body>
+</mjml>

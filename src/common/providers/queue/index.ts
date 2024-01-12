@@ -25,7 +25,7 @@ class QueueService {
     this.queues[queueName] = queue;
   }
 
-  async addToQueue(queueName: string, data: any, options?: any): Promise<void> {
+  async addToQueue(queueName: string, data: any, options?: Queue.JobOptions | undefined): Promise<void> {
     if (!this.queues[queueName]) throw new Error('Queue does not exists');
     const queue = this.queues[queueName] as Queue.Queue;
     queue.add(data, options);

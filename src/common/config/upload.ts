@@ -9,8 +9,8 @@ const storageConfig = {
     destination: uploadFolder,
     filename(request, file, callback) {
       const timestamp = new Date().getTime();
-
-      const filename = `${file.originalname}-${timestamp}`;
+      const ext = path.extname(file.originalname).toLowerCase();
+      const filename = `${file.originalname.split('.')[0]}-${timestamp}${ext}`;
 
       callback(null, filename);
     },

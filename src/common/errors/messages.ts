@@ -81,6 +81,46 @@ export const errorMessages = {
     AR: 'كود التحقق غير صالح',
     code: 400,
   },
+  INVALID_FILE_TYPE: {
+    EN: 'Invalid file type',
+    AR: 'نوع الملف غير صالح',
+    code: 400,
+  },
+  FILE_NOT_FOUND: {
+    EN: 'File not found',
+    AR: 'الملف غير موجود',
+    code: 404,
+  },
+  AUTHOR_NOT_FOUND: {
+    EN: 'Author not found',
+    AR: 'المؤلف غير موجود',
+    code: 404,
+  },
+  BOOK_NOT_FOUND: {
+    EN: 'Book not found',
+    AR: 'الكتاب غير موجود',
+    code: 404,
+  },
+  BOOKING_NOT_FOUND: {
+    EN: 'Booking not found',
+    AR: 'الحجز غير موجود',
+    code: 404,
+  },
+  BOOK_NOT_AVAILABLE: {
+    EN: 'Book not available',
+    AR: 'الكتاب غير متوفر',
+    code: 404,
+  },
+  BOOKING_DATE_CANNOT_BE_IN_PAST: {
+    EN: 'Booking date cannot be in the past',
+    AR: 'تاريخ الحجز لا يمكن ان يكون في الماضي',
+    code: 400,
+  },
+  BOOKING_DATE_CANNOT_BE_GREATER_THAN_7_DAYS: {
+    EN: 'Booking date cannot be greater than 7 days',
+    AR: 'تاريخ الحجز لا يمكن ان يكون اكبر من 7 ايام',
+    code: 400,
+  },
   DEFAULT: {
     EN: 'Something went wrong',
     AR: 'حدث خطأ ما',

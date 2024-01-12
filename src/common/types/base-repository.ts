@@ -42,11 +42,13 @@ export class BaseRepository<T extends ObjectLiteral> extends Repository<T> {
     errorCode?: TMessage,
     include: FindOptionsRelations<T> | FindOptionsRelationByString = [],
     attributes?: FindOptionsSelect<T> | FindOptionsSelectByString<T>,
+    sort?: FindOptionsOrder<T>,
   ): Promise<T> {
     const result = await this.findOne(
       this.changeOptions(where),
       include,
       attributes,
+      sort,
     );
     if (!result) throw new BaseError(errorCode || errorMessages.NOT_FOUND);
     return result;
@@ -291,8 +293,12 @@ export class BaseRepository<T extends ObjectLiteral> extends Repository<T> {
         ...this.changeOptions(where),
         [paginationKey]:
           direction === 'AFTER'
-            ? MoreThan(cursorValue.getTime())
-            : LessThan(cursorValue.getTime()),
+            ? MoreThan(
+                keyType === 'NUMBER' ? cursorValue.getTime() : cursorValue,
+              )
+            : LessThan(
+                keyType === 'NUMBER' ? cursorValue.getTime() : cursorValue,
+              ),
       },
       undefined,
       //@ts-ignore
@@ -455,9 +461,9 @@ export class BaseRepository<T extends ObjectLiteral> extends Repository<T> {
     return this.save(models);
   }
 
-  async deleteAll(where: WhereOptions<T>): Promise<number> {
+  async deleteAll(where: FindOptionsWhere<T>): Promise<number> {
     const result = await this.delete(
-      this.changeOptions(where) as WhereOptions<T>,
+      this.changeOptions(where) as FindOptionsWhere<T>,
     );
     return result.affected || 0;
   }
@@ -537,6 +543,8 @@ export class BaseRepository<T extends ObjectLiteral> extends Repository<T> {
   }
 }
 
-export type WhereOptions<T> = FindOptionsWhere<T> & {
+export type WhereOptions<T> = {
+  [P in keyof FindOptionsWhere<T>]?: FindOptionsWhere<T>[P] | null;
+} & {
   $or?: FindOptionsWhere<T>[];
 };

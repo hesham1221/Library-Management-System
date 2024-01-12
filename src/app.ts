@@ -14,6 +14,7 @@ import BaseError from '@common/errors/base-error';
 import { dataSource } from '@common/database';
 import { get } from 'env-var';
 import { User } from '@modules/users/entities/user.entity';
+import '@modules/file/file.schedual';
 
 async function main() {
   try {

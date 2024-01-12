@@ -7,12 +7,6 @@
           >You have successfully signed up for our Library Management System.
           Start exploring a vast collection of books and resources.</mj-text
         >
-        <mj-button
-          background-color="#5c67a3"
-          color="white"
-          href="https://your-library-url.com/signin"
-          >Sign In</mj-button
-        >
       </mj-column>
     </mj-section>
     <mj-include path="../components/footer.mjml" />

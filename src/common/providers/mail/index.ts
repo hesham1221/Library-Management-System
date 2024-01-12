@@ -70,5 +70,9 @@ interface ISendMailOptions {
   subject: string;
   from?: string;
   templateData?: any;
-  templateName: 'sign-up' | 'sign-in' | 'otp';
+  templateName:
+    | 'sign-up'
+    | 'otp'
+    | 'booked-successfully'
+    | 'warn-to-return';
 }

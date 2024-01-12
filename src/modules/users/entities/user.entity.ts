@@ -2,6 +2,8 @@ import { BaseModel } from '@common/database/base-model';
 import { Column, DeleteDateColumn, Entity, OneToMany } from 'typeorm';
 import { UserVerificationCode } from './user-verification-code.entity';
 import { UserRolEnum } from '../user.enum';
+import { Book } from '@modules/books/entities/book.entity';
+import { BookBorrowDetails } from '@modules/books/entities/book-borrow-details.entity';
 
 @Entity()
 export class User extends BaseModel {
@@ -40,6 +42,12 @@ export class User extends BaseModel {
     default: UserRolEnum.BORROWER,
   })
   role: UserRolEnum;
+
+  @Column({ nullable: true, default: 0 })
+  numberOfBorrowedBooks: number;
+
+  @OneToMany(() => BookBorrowDetails, details => details.borrower)
+  bookBorrowDetails?: BookBorrowDetails[];
 
   @OneToMany(() => UserVerificationCode, code => code.user)
   userVerificationCodes?: UserVerificationCode[];

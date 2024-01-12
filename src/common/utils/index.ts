@@ -29,6 +29,27 @@ export function isImage(filePath: string): boolean {
   );
 }
 
+export function formatDateddmmyyyy(date: Date) {
+  let day: string | number = date.getDate();
+  let month: string | number = date.getMonth() + 1;
+  let year = date.getFullYear();
+  day = day < 10 ? '0' + day : day;
+  month = month < 10 ? '0' + month : month;
+  return `${day}/${month}/${year}`;
+}
+
+export function getDateOnly(timestamp: Date): Date {
+  if (timestamp instanceof Date) {
+    const year = timestamp.getFullYear();
+    const month = String(timestamp.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(timestamp.getDate()).padStart(2, '0');
+    const formattedDate = `${month}/${day}/${year % 100}`;
+    return new Date(`${formattedDate}`);
+  } else {
+    throw new Error('Input must be a Date object');
+  }
+}
+
 export function generateAuthToken(id: string, isTemporary = false): string {
   return jwt.sign({ userId: id }, get('JWT_SECRET').required().asString(), {
     ...(isTemporary && { expiresIn: 30 * 60 }),

@@ -1,0 +1,17 @@
+<mjml>
+  <mj-body>
+    <mj-include path="../components/header.mjml" />
+    <mj-section background-color="#ffffff" padding="20px">
+      <mj-column>
+        <mj-text font-size="16px" line-height="200%" color="#555555">
+          Please note that you need to return the borrowed book : <b>{{bookTitle}}<b> within the next 24 hours. Failure to do so may result in additional charges.
+        </mj-text>
+        <mj-text font-size="16px" color="#555555">
+          If you have any questions or concerns, please contact us immediately. Thank you for your prompt attention to this matter.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-include path="../components/footer.mjml" />
+  </mj-body>
+</mjml>
